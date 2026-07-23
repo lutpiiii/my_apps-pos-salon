@@ -1,0 +1,41 @@
+1. Sistem Booking / Reservasi Online
+Ini adalah fitur paling penting untuk salon modern.
+•
+Fungsi: Pelanggan bisa memilih layanan, tanggal, dan jam kunjungan langsung dari Landing Page.
+•
+Manfaat: Mengurangi antrean menumpuk dan membantu Anda mengatur jadwal staff dengan lebih efisien.
+2. Manajemen Stok & Inventaris (Inventory)
+Salon menggunakan banyak produk (shampoo, pewarna rambut, vitamin, dll).
+•
+Fungsi: Mencatat stok masuk dan otomatis berkurang saat digunakan dalam layanan tertentu.
+•
+Manfaat: Memberitahu Anda kapan harus belanja stok lagi dan mencegah kehilangan barang.
+
+OK 3. Cetak Struk (Thermal Printer)
+Sangat penting untuk modul POS/Kasir yang sudah kita buat.
+•
+Fungsi: Menambahkan tombol "Cetak Struk" setelah transaksi berhasil untuk mencetak ke printer thermal (kecil).
+•
+Manfaat: Memberikan bukti pembayaran profesional kepada pelanggan.
+4. Manajemen Member & Loyalitas
+•
+Fungsi: Mencatat data pelanggan tetap. Pelanggan bisa mengumpulkan poin setiap transaksi yang nantinya bisa ditukar diskon.
+•
+Manfaat: Membuat pelanggan senang kembali lagi ke salon Anda.
+TIDAK PERLU 5. Komisi Pegawai (Stylist)
+Biasanya setiap staff salon mendapat komisi per layanan yang mereka kerjakan.
+•
+Fungsi: Saat transaksi di POS, kasir bisa memilih siapa staff yang mengerjakan layanan tersebut. Sistem akan otomatis menghitung total komisi mereka.
+•
+Manfaat: Mempermudah Anda menghitung gaji/bonus bulanan pegawai secara otomatis dan transparan.
+OK 6. Export Laporan (Excel/PDF)
+•
+Fungsi: Menambahkan tombol "Download Excel" atau "Cetak PDF" pada halaman laporan pendapatan dan pengeluaran.
+•
+Manfaat: Memudahkan Anda saat ingin melakukan pembukuan di luar aplikasi atau untuk arsip fisik.
+7. Testimoni Pelanggan di Landing Page
+•
+Fungsi: Modul bagi admin untuk memasukkan ulasan positif dari pelanggan di halaman depan.
+•
+Manfaat: Meningkatkan kepercayaan calon pelanggan baru yang melihat website Anda.
+8. tambahkan log jika ada yang menghapus, edit, menambah data.

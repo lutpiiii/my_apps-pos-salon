@@ -51,12 +51,12 @@
             <span>Riwayat Transaksi</span>
         </a>
 
-        <div class="px-4 py-2 mt-3 mb-1 small text-uppercase text-muted fw-bold" style="letter-spacing: 1px; font-size: 0.7rem;">Laporan</div>
+        <!-- <div class="px-4 py-2 mt-3 mb-1 small text-uppercase text-muted fw-bold" style="letter-spacing: 1px; font-size: 0.7rem;">Laporan</div>
 
         <a href="{{ route('admin.laporan.masuk') }}" class="nav-link-kasir {{ Request::is('admin/laporan/masuk*') ? 'active' : '' }}">
             <i class="bi bi-file-earmark-bar-graph"></i>
             <span>Laporan Harian</span>
-        </a>
+        </a> -->
     </div>
 
     <div class="p-3 mt-auto">

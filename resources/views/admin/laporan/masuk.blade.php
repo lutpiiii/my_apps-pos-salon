@@ -1,4 +1,4 @@
-@extends('layouts.dashboard.admin')
+@extends(Auth::user()->role_p === 'admin' ? 'layouts.dashboard.admin' : 'layouts.dashboard.kasir')
 
 @section('content')
 <div class="container-fluid">

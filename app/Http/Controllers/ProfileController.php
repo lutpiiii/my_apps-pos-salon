@@ -36,14 +36,14 @@ class ProfileController extends Controller
         }
 
         if ($request->hasFile('foto_p')) {
-            $uploadPath = public_path('assets/uploads');
+            $uploadPath = base_path('public/assets/uploads');
             if (!file_exists($uploadPath)) {
                 mkdir($uploadPath, 0777, true);
             }
 
             // Delete old photo
             if ($user->foto_p) {
-                $oldPath = $uploadPath . '/' . $user->foto_p;
+                $oldPath = $uploadPath . DIRECTORY_SEPARATOR . $user->foto_p;
                 if (file_exists($oldPath) && is_file($oldPath)) {
                     unlink($oldPath);
                 }

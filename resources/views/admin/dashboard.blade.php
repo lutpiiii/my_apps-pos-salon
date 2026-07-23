@@ -152,7 +152,7 @@
                                 <td class="fw-bold">#TRX-{{ $trx->id_t }}</td>
                                 <td>
                                     @foreach($trx->detailTransaksis as $detail)
-                                        <span>{{ $detail->menu->nama_m }}, </span>
+                                        <span class="badge badge-purple-soft mb-1">{{ $detail->menu->nama_m }}</span>
                                     @endforeach
                                 </td>
                                 <td class="text-purple-600 fw-bold">Rp {{ number_format($trx->totalBayar_t, 0, ',', '.') }}</td>

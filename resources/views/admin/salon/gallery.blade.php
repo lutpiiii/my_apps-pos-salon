@@ -89,7 +89,7 @@
         <div class="modal fade" id="editGalleryModal{{ $item->id_inf }}" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content modal-content-refined shadow-lg">
-                    <form action="{{ route('admin.salon.gallery.update', $item->id_inf) }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('admin.salon.gallery.update', $item->id_inf) }}" method="POST" enctype="multipart/form-data" class="upload-form">
                         @csrf
                         @method('PUT')
                         <div class="modal-header border-0 p-4 pb-0">
@@ -97,17 +97,26 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body p-4">
-                            <div class="mb-3 text-center">
-                                <img src="{{ asset('assets/uploads/'.$item->foto_inf) }}" class="rounded-4 mb-3 shadow-sm" style="max-height: 150px; max-width: 100%; object-fit: cover;">
+                            <div class="mb-4 text-center">
+                                <p class="small text-muted mb-2 fw-bold text-uppercase">Foto Saat Ini</p>
+                                <img src="{{ asset('assets/uploads/'.$item->foto_inf) }}" class="rounded-4 shadow-sm" style="max-height: 120px; object-fit: cover;">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label fw-bold text-muted small uppercase">Judul</label>
                                 <input type="text" name="judul_inf" class="form-control rounded-4 border-2 p-3" value="{{ $item->judul_inf }}" required>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label fw-bold text-muted small uppercase">Foto Baru (Opsional)</label>
-                                <input type="file" name="foto_inf" class="form-control rounded-4 border-2 p-2">
-                                <small class="text-muted">Biarkan kosong jika tidak ingin mengganti foto.</small>
+                                <label class="form-label fw-bold text-muted small uppercase">Ganti Foto (Opsional)</label>
+                                <div class="upload-container border-2 border-dashed rounded-4 p-3 text-center bg-light position-relative" style="border-style: dashed !important; border-color: #e2e8f0 !important;">
+                                    <input type="file" name="foto_inf" class="form-control opacity-0 position-absolute top-0 start-0 w-100 h-100 cursor-pointer" onchange="previewUpload(this, 'editPreview{{ $item->id_inf }}')">
+                                    <div id="editPreview{{ $item->id_inf }}" class="d-none mb-2">
+                                        <img src="" class="img-fluid rounded-3 shadow-sm" style="max-height: 120px;">
+                                    </div>
+                                    <div id="editUploadPlaceholder{{ $item->id_inf }}">
+                                        <i class="bi bi-image text-purple-600 fs-2 d-block mb-1"></i>
+                                        <span class="text-muted extra-small">Pilih foto baru</span>
+                                    </div>
+                                </div>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label fw-bold text-muted small uppercase">Keterangan</label>
@@ -116,7 +125,9 @@
                         </div>
                         <div class="modal-footer border-0 p-4 pt-0">
                             <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
-                            <button type="submit" class="btn btn-purple-refined px-4">Simpan Perubahan</button>
+                            <button type="submit" class="btn btn-purple-refined px-4 btn-submit">
+                                <span class="spinner-border spinner-border-sm d-none me-2"></span>Simpan
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -138,7 +149,7 @@
 <div class="modal fade" id="addGalleryModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content modal-content-refined shadow-lg">
-            <form action="{{ route('admin.salon.gallery.store') }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('admin.salon.gallery.store') }}" method="POST" enctype="multipart/form-data" class="upload-form">
                 @csrf
                 <div class="modal-header border-0 p-4 pb-0">
                     <h5 class="fw-bold text-purple-600">Tambah Galeri Baru</h5>
@@ -151,8 +162,17 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold text-muted small uppercase">Foto</label>
-                        <input type="file" name="foto_inf" class="form-control rounded-4 border-2 p-2" required>
-                        <small class="text-muted">Format: JPG, PNG, JPEG. Maks 2MB.</small>
+                        <div class="upload-container border-2 border-dashed rounded-4 p-4 text-center bg-light position-relative" style="border-style: dashed !important; border-color: #e2e8f0 !important;">
+                            <input type="file" name="foto_inf" class="form-control opacity-0 position-absolute top-0 start-0 w-100 h-100 cursor-pointer" required onchange="previewUpload(this, 'addPreview')">
+                            <div id="addPreview" class="d-none mb-2">
+                                <img src="" class="img-fluid rounded-3 shadow-sm" style="max-height: 150px;">
+                            </div>
+                            <div id="addUploadPlaceholder">
+                                <i class="bi bi-cloud-arrow-up text-purple-600 fs-1 d-block mb-2"></i>
+                                <span class="text-muted small">Klik atau drop gambar di sini</span>
+                            </div>
+                        </div>
+                        <small class="text-muted mt-2 d-block">Format: JPG, PNG, JPEG. Maks 2MB.</small>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold text-muted small uppercase">Keterangan</label>
@@ -161,7 +181,9 @@
                 </div>
                 <div class="modal-footer border-0 p-4 pt-0">
                     <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-purple-refined px-4">Upload Galeri</button>
+                    <button type="submit" class="btn btn-purple-refined px-4 btn-submit">
+                        <span class="spinner-border spinner-border-sm d-none me-2"></span>Upload Galeri
+                    </button>
                 </div>
             </form>
         </div>
@@ -189,5 +211,29 @@
         document.getElementById('previewModalTitle').innerText = title;
         new bootstrap.Modal(document.getElementById('imagePreviewModal')).show();
     }
+
+    function previewUpload(input, previewId) {
+        const preview = document.getElementById(previewId);
+        const placeholder = document.getElementById(previewId.includes('add') ? 'addUploadPlaceholder' : 'editUploadPlaceholder' + previewId.replace('editPreview', ''));
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.querySelector('img').src = e.target.result;
+                preview.classList.remove('d-none');
+                if (placeholder) placeholder.classList.add('d-none');
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    // Handle Form Submit Loading
+    document.querySelectorAll('.upload-form').forEach(form => {
+        form.addEventListener('submit', function() {
+            const btn = this.querySelector('.btn-submit');
+            btn.disabled = true;
+            btn.querySelector('.spinner-border').classList.remove('d-none');
+        });
+    });
 </script>
 @endsection

@@ -23,7 +23,7 @@ class MenuController extends Controller
             $query->where('id_kategori', $id_kategori);
         }
 
-        $menus = $query->paginate(10);
+        $menus = $query->paginate(12);
         $categories = Kategorilayanan::where('is_deleted', false)->get();
         return view('admin.menu.index', compact('menus', 'categories'));
     }

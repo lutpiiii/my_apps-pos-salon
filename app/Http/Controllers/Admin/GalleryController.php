@@ -23,21 +23,25 @@ class GalleryController extends Controller
             'keterangan_inf' => 'required|string',
         ]);
 
-        $uploadPath = public_path('assets/uploads');
-        if (!file_exists($uploadPath)) {
-            mkdir($uploadPath, 0777, true);
+        try {
+            $uploadPath = base_path('public/assets/uploads');
+            if (!file_exists($uploadPath)) {
+                mkdir($uploadPath, 0777, true);
+            }
+
+            $fileName = time() . '_' . uniqid() . '.' . $request->file('foto_inf')->extension();
+            $request->file('foto_inf')->move($uploadPath, $fileName);
+
+            Infosalon::create([
+                'judul_inf' => $request->judul_inf,
+                'foto_inf' => $fileName,
+                'keterangan_inf' => $request->keterangan_inf,
+            ]);
+
+            return redirect()->route('admin.salon.gallery')->with('success', 'Foto galeri berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal mengunggah foto: ' . $e->getMessage())->withInput();
         }
-
-        $fileName = time() . '_' . uniqid() . '.' . $request->foto_inf->extension();
-        $request->foto_inf->move($uploadPath, $fileName);
-
-        Infosalon::create([
-            'judul_inf' => $request->judul_inf,
-            'foto_inf' => $fileName,
-            'keterangan_inf' => $request->keterangan_inf,
-        ]);
-
-        return redirect()->route('admin.salon.gallery')->with('success', 'Foto galeri berhasil ditambahkan.');
     }
 
     public function update(Request $request, $id)
@@ -50,31 +54,37 @@ class GalleryController extends Controller
             'keterangan_inf' => 'required|string',
         ]);
 
-        $data = [
-            'judul_inf' => $request->judul_inf,
-            'keterangan_inf' => $request->keterangan_inf,
-        ];
+        try {
+            $data = [
+                'judul_inf' => $request->judul_inf,
+                'keterangan_inf' => $request->keterangan_inf,
+            ];
 
-        if ($request->hasFile('foto_inf')) {
-            $uploadPath = public_path('assets/uploads');
-            if (!file_exists($uploadPath)) {
-                mkdir($uploadPath, 0777, true);
+            if ($request->hasFile('foto_inf')) {
+                $uploadPath = base_path('public/assets/uploads');
+                if (!file_exists($uploadPath)) {
+                    mkdir($uploadPath, 0777, true);
+                }
+
+                // Delete old photo safely
+                if ($item->foto_inf) {
+                    $oldPath = $uploadPath . DIRECTORY_SEPARATOR . $item->foto_inf;
+                    if (file_exists($oldPath) && is_file($oldPath)) {
+                        unlink($oldPath);
+                    }
+                }
+
+                $fileName = time() . '_' . uniqid() . '.' . $request->file('foto_inf')->extension();
+                $request->file('foto_inf')->move($uploadPath, $fileName);
+                $data['foto_inf'] = $fileName;
             }
 
-            // Delete old photo
-            $oldPath = $uploadPath . '/' . $item->foto_inf;
-            if (file_exists($oldPath) && is_file($oldPath)) {
-                unlink($oldPath);
-            }
+            $item->update($data);
 
-            $fileName = time() . '_' . uniqid() . '.' . $request->foto_inf->extension();
-            $request->foto_inf->move($uploadPath, $fileName);
-            $data['foto_inf'] = $fileName;
+            return redirect()->route('admin.salon.gallery')->with('success', 'Item galeri berhasil diperbarui.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal memperbarui galeri: ' . $e->getMessage())->withInput();
         }
-
-        $item->update($data);
-
-        return redirect()->route('admin.salon.gallery')->with('success', 'Item galeri berhasil diperbarui.');
     }
 
     public function destroy($id)

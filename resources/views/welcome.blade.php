@@ -5,13 +5,13 @@
 <section id="home" class="hero-section text-white">
     <div class="container hero-content">
         <div class="row align-items-center g-5">
-            <div class="col-lg-6" data-aos="fade-right">
-                <span class="hero-badge">Information and Contact</span>
-                <h1 class="display-2 fw-bold serif mb-4 leading-tight">
+            <div class="col-lg-6">
+                <span class="hero-badge animate__animated animate__fadeInDown">Information and Contact</span>
+                <h1 class="display-2 fw-bold serif mb-4 leading-tight animate__animated animate__fadeInLeft">
                     Redefine Your <br><span class="cursive gradient-text display-1">True Style</span>
                 </h1>
 
-                <div class="row g-4 mb-5">
+                <div class="row g-4 mb-5 animate__animated animate__fadeInUp" style="animation-delay: 0.3s;">
                     <div class="col-md-7">
                         <div class="d-flex gap-3 mb-4">
                             <div class="service-icon mb-0" style="width: 48px; height: 48px; min-width: 48px;">
@@ -132,6 +132,9 @@
 
         <div id="menusContainer" class="row g-4">
             @include('partials.menu_items', ['menus' => $menus])
+        </div>
+        <div id="menusPagination" class="mt-5 d-flex justify-content-center">
+            {{ $menus->links('pagination::bootstrap-4') }}
         </div>
     </div>
 </section>

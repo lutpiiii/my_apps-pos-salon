@@ -22,10 +22,13 @@ class LandingPageController extends Controller
         if ($selectedCategory) {
             $query->where('id_kategori', $selectedCategory);
         }
-        $menus = $query->take(8)->get();
+        $menus = $query->paginate(8);
 
         if ($request->ajax()) {
-            return view('partials.menu_items', compact('menus'))->render();
+            return response()->json([
+                'html' => view('partials.menu_items', compact('menus'))->render(),
+                'pagination' => $menus->links('pagination::bootstrap-4')->render()
+            ]);
         }
 
         return view('welcome', compact('profile', 'informasi', 'categories', 'menus', 'selectedCategory'));

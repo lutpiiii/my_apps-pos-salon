@@ -15,14 +15,14 @@
 </head>
 <body onload="window.print()">
     <div class="text-center header">
-        <h3>NH BEAUTY SALON</h3>
-        <p>Jl. Raya Indah No. 123, Surabaya<br>Telp: {{ $profile->notelp_prf ?? '-' }}</p>
+        <h3 style="color: #581c87;">NH BEAUTY SALON</h3>
+        <p>Jl. Raya Indah No. 123, Surabaya<br>Telp: 628993959351</p>
     </div>
 
     <div class="line"></div>
 
     <div>
-        No: #TRX-{{ $transaksi->id_t }}<br>
+        No: {{ $transaksi->kode_t }}<br>
         Tgl: {{ $transaksi->tanggal_t->format('d/m/Y H:i') }}<br>
         Kasir: {{ $transaksi->pengguna->nama_p }}
     </div>
@@ -31,8 +31,10 @@
 
     @foreach($transaksi->detailTransaksis as $detail)
     <div class="item">
-        <div>{{ $detail->menu->nama_m }}</div>
-        <div class="text-right">1 x {{ number_format($detail->harga_saat_ini, 0, ',', '.') }}</div>
+        <div style="display: flex; justify-content: space-between;">
+            <span style="flex: 1;">{{ $detail->menu->nama_m }}</span>
+            <span style="text-align: right; white-space: nowrap;">{{ $detail->jumlah }} x {{ number_format($detail->harga_saat_ini, 0, ',', '.') }}</span>
+        </div>
     </div>
     @endforeach
 

@@ -1,4 +1,4 @@
-@extends(Auth::user()->role_p === 'admin' ? 'layouts.dashboard.admin' : 'layouts.dashboard.kasir')
+@extends(strtolower(Auth::user()->role_p) === 'admin' ? 'layouts.dashboard.admin' : 'layouts.dashboard.kasir')
 
 @section('content')
 <div class="container-fluid">
@@ -12,7 +12,7 @@
             <div class="row g-3 align-items-end">
                 <div class="col-md-3">
                     <label class="form-label fw-bold small text-muted text-uppercase">Tipe Laporan</label>
-                    <select name="filter_type" id="filterType" class="form-select rounded-pill border-2 fw-bold text-purple-600">
+                    <select name="filter_type" id="filterType" class="form-select rounded-pill border-2 fw-bold text-success">
                         <option value="harian" {{ $filterType === 'harian' ? 'selected' : '' }}>Harian</option>
                         <option value="range" {{ $filterType === 'range' ? 'selected' : '' }}>Range Tanggal</option>
                         <option value="tahunan" {{ $filterType === 'tahunan' ? 'selected' : '' }}>Tahunan</option>
@@ -58,7 +58,7 @@
                 </div>
                 <div class="col-md-2">
                     <div class="dropdown">
-                        <button class="btn btn-outline-purple rounded-pill w-100 dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <button class="btn btn-outline-success rounded-pill w-100 dropdown-toggle" type="button" data-bs-toggle="dropdown">
                             <i class="bi bi-download me-1"></i> Export
                         </button>
                         <ul class="dropdown-menu border-0 shadow-lg rounded-4">
@@ -77,7 +77,7 @@
     <!-- Summary Card -->
     <div class="row mb-5">
         <div class="col-md-12">
-            <div class="stat-card-gradient p-4 animate__animated animate__pulse" style="background: linear-gradient(135deg, var(--purple-main), var(--purple-medium));">
+            <div class="stat-card-gradient p-4 animate__animated animate__pulse" style="background: linear-gradient(135deg, #22c55e, #4ade80);">
                 <div class="d-flex align-items-center gap-4">
                     <div class="icon-box-refined shadow-lg">
                         <i class="bi bi-wallet2"></i>
@@ -100,7 +100,7 @@
                         <tr>
                             <th>No</th>
                             <th>Tanggal & Waktu</th>
-                            <th>ID Transaksi</th>
+                            <th>Kode Transaksi</th>
                             <th>Layanan</th>
                             <th>Kasir</th>
                             <th class="text-end">Total Bayar</th>
@@ -111,14 +111,14 @@
                         <tr class="shadow-sm mb-2">
                             <td class="fw-medium text-muted">{{ $transaksi->firstItem() + $index }}</td>
                             <td class="fw-bold">{{ $item->tanggal_t->format('d/m/Y H:i') }}</td>
-                            <td><span class="text-muted">#</span>TRX-{{ $item->id_t }}</td>
+                            <td class="fw-bold text-purple-600">{{ $item->kode_t }}</td>
                             <td>
                                 @foreach($item->detailTransaksis as $detail)
                                     <span class="badge badge-purple-soft mb-1">{{ $detail->menu->nama_m }}</span>
                                 @endforeach
                             </td>
                             <td><span class="fw-bold text-dark">{{ $item->pengguna->nama_p }}</span></td>
-                            <td class="text-end text-purple-600 fw-bold">Rp {{ number_format($item->totalBayar_t, 0, ',', '.') }}</td>
+                            <td class="text-end text-success fw-bold">Rp {{ number_format($item->totalBayar_t, 0, ',', '.') }}</td>
                         </tr>
                         @empty
                         <tr>

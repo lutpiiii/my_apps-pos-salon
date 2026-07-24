@@ -16,6 +16,7 @@ class Transaksimasuk extends Model
 
     protected $fillable = [
         'id_pengguna',
+        'id_reservasi',
         'tanggal_t',
         'totalBayar_t',
         'bayar_t',
@@ -34,8 +35,23 @@ class Transaksimasuk extends Model
         return $this->belongsTo(Pengguna::class, 'id_pengguna', 'id_p');
     }
 
+    public function reservasi(): BelongsTo
+    {
+        return $this->belongsTo(Reservasi::class, 'id_reservasi', 'id_r');
+    }
+
     public function detailTransaksis(): HasMany
     {
         return $this->hasMany(Detailtransaksi::class, 'id_masuk', 'id_t');
+    }
+
+    public function getKodeTAttribute()
+    {
+        if ($this->id_reservasi && $this->reservasi) {
+            return $this->reservasi->kode_reservasi;
+        }
+
+        $tanggal = $this->tanggal_t ?? now();
+        return 'TRX-' . $tanggal->format('Ymd') . '-' . str_pad($this->id_t, 4, '0', STR_PAD_LEFT);
     }
 }

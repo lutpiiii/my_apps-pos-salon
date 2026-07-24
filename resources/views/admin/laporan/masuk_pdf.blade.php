@@ -24,7 +24,7 @@
             <tr>
                 <th>No</th>
                 <th>Tanggal</th>
-                <th>ID TRX</th>
+                <th>Kode Transaksi</th>
                 <th>Layanan</th>
                 <th>Kasir</th>
                 <th style="text-align: right;">Total Bayar</th>
@@ -35,7 +35,7 @@
             <tr>
                 <td>{{ $index + 1 }}</td>
                 <td>{{ $item->tanggal_t->format('d/m/Y H:i') }}</td>
-                <td>#TRX-{{ $item->id_t }}</td>
+                <td>{{ $item->kode_t }}</td>
                 <td>
                     @foreach($item->detailTransaksis as $detail)
                         {{ $detail->menu->nama_m }}{{ !$loop->last ? ',' : '' }}

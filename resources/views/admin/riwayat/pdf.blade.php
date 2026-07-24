@@ -24,6 +24,7 @@
             <tr>
                 <th>No</th>
                 <th>Tanggal</th>
+                <th>Kode Transaksi</th>
                 <th>Kasir</th>
                 <th>Layanan</th>
                 <th>Total Bayar</th>
@@ -34,6 +35,7 @@
             <tr>
                 <td>{{ $index + 1 }}</td>
                 <td>{{ $item->tanggal_t->format('d/m/Y H:i') }}</td>
+                <td>{{ $item->kode_t }}</td>
                 <td>{{ $item->pengguna->nama_p }}</td>
                 <td>
                     @foreach($item->detailTransaksis as $detail)

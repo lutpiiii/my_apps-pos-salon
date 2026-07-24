@@ -6,6 +6,7 @@ use App\Models\Profilesalon;
 use App\Models\Kategorilayanan;
 use App\Models\Menulayanan;
 use App\Models\Infosalon;
+use App\Models\Pengguna;
 use Illuminate\Http\Request;
 
 class LandingPageController extends Controller
@@ -15,6 +16,8 @@ class LandingPageController extends Controller
         $profile = Profilesalon::first();
         $informasi = Infosalon::all();
         $categories = Kategorilayanan::where('is_deleted', false)->get();
+        $allMenus = Menulayanan::where('is_deleted', false)->orderBy('nama_m', 'asc')->get();
+        $stylists = Pengguna::all();
 
         $selectedCategory = $request->query('id_kategori');
 
@@ -31,6 +34,6 @@ class LandingPageController extends Controller
             ]);
         }
 
-        return view('welcome', compact('profile', 'informasi', 'categories', 'menus', 'selectedCategory'));
+        return view('welcome', compact('profile', 'informasi', 'categories', 'menus', 'selectedCategory', 'allMenus', 'stylists'));
     }
 }

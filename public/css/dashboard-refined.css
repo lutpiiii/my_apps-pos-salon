@@ -209,6 +209,16 @@ body {
     border: 1px solid rgba(88, 28, 135, 0.1);
 }
 
+.badge-info {
+    background-color: #e0f2fe;
+    color: #0369a1 !important;
+    padding: 6px 15px;
+    border-radius: 100px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    border: 1px solid rgba(3, 105, 161, 0.1);
+}
+
 /* MODALS */
 .modal-content-refined {
     border-radius: 35px;

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ReservasiController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\KategoriController;
 use App\Http\Controllers\Admin\MenuController;
@@ -11,11 +12,16 @@ use App\Http\Controllers\Admin\LaporanKeluarController;
 use App\Http\Controllers\Admin\ProfileSalonController;
 use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\PenggunaController;
+use App\Http\Controllers\Admin\ReservasiController as AdminReservasiController;
 use App\Http\Controllers\Kasir\DashboardController as KasirDashboardController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [LandingPageController::class, 'index'])->name('landing');
+
+// Public Reservasi Routes
+Route::post('/reservasi', [ReservasiController::class, 'store'])->name('reservasi.store');
+Route::get('/reservasi/cek', [ReservasiController::class, 'cekStatus'])->name('reservasi.cek');
 
 // Auth Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -36,6 +42,12 @@ Route::middleware(['auth', 'role:admin,kasir'])->prefix('admin')->group(function
     // Kasir POS
     Route::get('/kasir', [KasirController::class, 'index'])->name('admin.kasir.index');
     Route::post('/kasir', [KasirController::class, 'store'])->name('admin.kasir.store');
+
+    // Reservasi (Shared for Admin & Kasir)
+    Route::get('/reservasi', [AdminReservasiController::class, 'index'])->name('admin.reservasi.index');
+    Route::put('/reservasi/{id}/status', [AdminReservasiController::class, 'updateStatus'])->name('admin.reservasi.updateStatus');
+    Route::delete('/reservasi/{id}', [AdminReservasiController::class, 'destroy'])->name('admin.reservasi.destroy');
+    Route::get('/reservasi/{id}/kasir', [AdminReservasiController::class, 'prosesKeKasir'])->name('admin.reservasi.kasir');
 
     // Riwayat & Laporan
     Route::get('/riwayat', [TransaksiController::class, 'riwayat'])->name('admin.riwayat.index');

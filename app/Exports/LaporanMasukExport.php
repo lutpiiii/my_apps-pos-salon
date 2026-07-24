@@ -36,7 +36,7 @@ class LaporanMasukExport implements FromCollection, WithHeadings, WithMapping
     public function headings(): array
     {
         return [
-            'ID Transaksi',
+            'Kode Transaksi',
             'Tanggal',
             'Layanan',
             'Kasir',
@@ -51,7 +51,7 @@ class LaporanMasukExport implements FromCollection, WithHeadings, WithMapping
         })->implode(', ');
 
         return [
-            'TRX-' . $trx->id_t,
+            $trx->kode_t,
             $trx->tanggal_t->format('d/m/Y H:i'),
             $layanan,
             $trx->pengguna->nama_p ?? '-',

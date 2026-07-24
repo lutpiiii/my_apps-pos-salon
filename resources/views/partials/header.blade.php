@@ -23,15 +23,39 @@
                     <li class="nav-item"><a class="nav-link text-white px-3" href="#about">About</a></li>
                     <li class="nav-item"><a class="nav-link text-white px-3" href="#services">Layanan</a></li>
                     <li class="nav-item"><a class="nav-link text-white px-3" href="#info">Gallery</a></li>
-                    <li class="nav-item"><a class="nav-link text-white px-3" href="#location">Lokasi</a></li>
-                    <li class="nav-item ms-lg-3 mt-3 mt-lg-0">
+                    <li class="nav-item ms-lg-2">
+                        <button type="button" class="btn btn-warning px-4 rounded-pill fw-bold text-dark shadow-sm d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalBooking">
+                            <i class="bi bi-calendar-check-fill text-purple-700"></i>
+                            <span>Reservasi Online</span>
+                        </button>
+                    </li>
+                    <li class="nav-item ms-lg-2 mt-3 mt-lg-0">
                         @auth
-                            <form action="{{ route('logout') }}" method="POST">
-                                @csrf
-                                <button type="submit" class="btn btn-purple px-4 rounded-pill fw-bold text-white shadow-sm">
-                                    <i class="bi bi-box-arrow-right me-1"></i> Logout
+                            <div class="dropdown">
+                                <button class="btn btn-purple px-4 rounded-pill fw-bold text-white shadow-sm dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
+                                    <div class="rounded-circle overflow-hidden bg-white/20 d-flex align-items-center justify-content-center" style="width: 25px; height: 25px;">
+                                        @if(Auth::user()->foto_p)
+                                            <img src="{{ asset('assets/uploads/'.Auth::user()->foto_p) }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                        @else
+                                            <i class="bi bi-person-fill text-white fs-6"></i>
+                                        @endif
+                                    </div>
+                                    <span>Panel {{ ucfirst(Auth::user()->role_p) }}</span>
                                 </button>
-                            </form>
+                                <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-4 mt-2">
+                                    <li><a class="dropdown-item py-2" href="{{ Auth::user()->role_p === 'admin' ? route('admin.dashboard') : route('kasir.dashboard') }}"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a></li>
+                                    <li><a class="dropdown-item py-2" href="{{ route('profile.index') }}"><i class="bi bi-person me-2"></i> Profil Saya</a></li>
+                                    <li><hr class="dropdown-divider opacity-50"></li>
+                                    <li>
+                                        <form action="{{ route('logout') }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="dropdown-item py-2 text-danger">
+                                                <i class="bi bi-box-arrow-right me-2"></i> Logout
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
                         @else
                             <a class="btn btn-purple px-4 rounded-pill fw-bold text-white shadow-sm" href="{{ route('login') }}">
                                 <i class="bi bi-person-fill me-1"></i> Login

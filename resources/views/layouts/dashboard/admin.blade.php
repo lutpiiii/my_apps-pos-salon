@@ -39,12 +39,25 @@
             <span>Dashboard</span>
         </a>
 
-        <div class="px-4 py-2 mt-3 mb-1 small text-uppercase text-muted fw-bold" style="letter-spacing: 1px; font-size: 0.7rem;">Layanan & Menu</div>
+        <div class="px-4 py-2 mt-3 mb-1 small text-uppercase text-muted fw-bold" style="letter-spacing: 1px; font-size: 0.7rem;">Reservasi & Kasir</div>
+
+        <a href="{{ route('admin.reservasi.index') }}" class="nav-link-kasir d-flex align-items-center {{ Request::is('admin/reservasi*') ? 'active' : '' }}">
+            <i class="bi bi-calendar2-heart"></i>
+            <span>Reservasi</span>
+            @php
+                $pendingCount = \App\Models\Reservasi::where('status', 'Menunggu')->count();
+            @endphp
+            @if($pendingCount > 0)
+                <span class="badge bg-warning text-dark ms-auto rounded-pill">{{ $pendingCount }}</span>
+            @endif
+        </a>
 
         <a href="{{ route('admin.kasir.index') }}" class="nav-link-kasir {{ Request::is('admin/kasir*') ? 'active' : '' }}">
             <i class="bi bi-cart-plus"></i>
-            <span>Kasir</span>
+            <span>Kasir POS</span>
         </a>
+
+        <div class="px-4 py-2 mt-3 mb-1 small text-uppercase text-muted fw-bold" style="letter-spacing: 1px; font-size: 0.7rem;">Kelola Layanan</div>
 
         <a href="{{ route('admin.menu.index') }}" class="nav-link-kasir {{ Request::is('admin/menu*') ? 'active' : '' }}">
             <i class="bi bi-card-list"></i>

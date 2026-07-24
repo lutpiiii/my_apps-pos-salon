@@ -149,7 +149,7 @@
                             <tr class="shadow-sm mb-2">
                                 <td class="text-muted">{{ $index + 1 }}</td>
                                 <td class="fw-medium">{{ $trx->tanggal_t->format('H:i') }}</td>
-                                <td class="fw-bold">#TRX-{{ $trx->id_t }}</td>
+                                <td class="fw-bold text-purple-600">{{ $trx->kode_t }}</td>
                                 <td>
                                     @foreach($trx->detailTransaksis as $detail)
                                         <span class="badge badge-purple-soft mb-1">{{ $detail->menu->nama_m }}</span>

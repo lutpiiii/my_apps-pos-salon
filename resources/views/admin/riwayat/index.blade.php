@@ -1,4 +1,4 @@
-@extends(Auth::user()->role_p === 'admin' ? 'layouts.dashboard.admin' : 'layouts.dashboard.kasir')
+@extends(strtolower(Auth::user()->role_p) === 'admin' ? 'layouts.dashboard.admin' : 'layouts.dashboard.kasir')
 
 @section('content')
 <div class="container-fluid">
@@ -52,6 +52,7 @@
                         <tr>
                             <th>No</th>
                             <th>Tanggal</th>
+                            <th>Kode Transaksi</th>
                             <th>Kasir</th>
                             <th>Total Bayar</th>
                             <th>Layanan</th>
@@ -63,6 +64,11 @@
                         <tr class="shadow-sm mb-2">
                             <td class="fw-medium text-muted">{{ $transaksi->firstItem() + $index }}</td>
                             <td class="fw-bold">{{ $item->tanggal_t->format('d/m/Y H:i') }}</td>
+                            <td>
+                                <span class="badge {{ $item->id_reservasi ? 'badge-info' : 'badge-purple-soft' }} px-3 py-2 rounded-pill fw-bold small">
+                                    {{ $item->kode_t }}
+                                </span>
+                            </td>
                             <td>{{ $item->pengguna->nama_p }}</td>
                             <td class="text-purple-600 fw-bold">Rp {{ number_format($item->totalBayar_t, 0, ',', '.') }}</td>
                             <td>
@@ -143,7 +149,7 @@
                 content.innerHTML = `
                     <div class="mb-4">
                         <div class="small text-muted text-uppercase fw-bold mb-1" style="letter-spacing: 1px;">ID Transaksi</div>
-                        <div class="h5 fw-bold text-purple-600">#TRX-${data.id_t}</div>
+                        <div class="h5 fw-bold text-purple-600">${data.id_reservasi ? data.reservasi.kode_reservasi : 'TRX-' + new Date(data.tanggal_t).toISOString().slice(0,10).replace(/-/g,'') + '-' + data.id_t.toString().padStart(4, '0')}</div>
                     </div>
                     <div class="row mb-4">
                         <div class="col-6">

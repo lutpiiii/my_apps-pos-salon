@@ -43,9 +43,10 @@ class TransaksiController extends Controller
 
         $transaksi = $query->orderBy('tanggal_t', 'desc')->paginate(10);
 
-        // Encrypt IDs for view
+        // Encrypt IDs for view (URL Safe)
         foreach ($transaksi as $item) {
-            $item->encrypted_id = Crypt::encryptString($item->id_t);
+            $encrypted = Crypt::encryptString($item->id_t);
+            $item->encrypted_id = str_replace(['+', '/', '='], ['-', '_', ''], $encrypted);
         }
 
         $users = auth()->user()->role_p === 'admin' ? \App\Models\Pengguna::all() : collect();
@@ -88,11 +89,13 @@ class TransaksiController extends Controller
     public function show($id)
     {
         try {
-            $decryptedId = Crypt::decryptString($id);
-            $transaksi = Transaksimasuk::with(['pengguna', 'detailTransaksis.menu'])->findOrFail($decryptedId);
+            // Restore URL Safe string to original base64
+            $originalEncrypted = str_replace(['-', '_'], ['+', '/'], $id);
+            $decryptedId = Crypt::decryptString($originalEncrypted);
+            $transaksi = Transaksimasuk::with(['pengguna', 'detailTransaksis.menu', 'reservasi'])->findOrFail($decryptedId);
         } catch (\Exception $e) {
-            // Fallback for non-encrypted ID (during transition or if needed)
-            $transaksi = Transaksimasuk::with(['pengguna', 'detailTransaksis.menu'])->findOrFail($id);
+            // Fallback for non-encrypted ID
+            $transaksi = Transaksimasuk::with(['pengguna', 'detailTransaksis.menu', 'reservasi'])->findOrFail($id);
         }
 
         // Security check for cashier
@@ -106,10 +109,11 @@ class TransaksiController extends Controller
     public function cetakStruk($id)
     {
         try {
-            $decryptedId = Crypt::decryptString($id);
-            $transaksi = Transaksimasuk::with(['pengguna', 'detailTransaksis.menu'])->findOrFail($decryptedId);
+            $originalEncrypted = str_replace(['-', '_'], ['+', '/'], $id);
+            $decryptedId = Crypt::decryptString($originalEncrypted);
+            $transaksi = Transaksimasuk::with(['pengguna', 'detailTransaksis.menu', 'reservasi'])->findOrFail($decryptedId);
         } catch (\Exception $e) {
-            $transaksi = Transaksimasuk::with(['pengguna', 'detailTransaksis.menu'])->findOrFail($id);
+            $transaksi = Transaksimasuk::with(['pengguna', 'detailTransaksis.menu', 'reservasi'])->findOrFail($id);
         }
 
         // Security check for cashier

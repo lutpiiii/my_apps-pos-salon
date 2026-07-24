@@ -1,4 +1,4 @@
-@extends(Auth::user()->role_p === 'admin' ? 'layouts.dashboard.admin' : 'layouts.dashboard.kasir')
+@extends(strtolower(Auth::user()->role_p) === 'admin' ? 'layouts.dashboard.admin' : 'layouts.dashboard.kasir')
 
 @section('styles')
 <style>
@@ -129,10 +129,25 @@
         <div class="col-lg-4">
             <div class="card card-refined border-0 shadow-lg cart-container">
                 <div class="card-body p-4 d-flex flex-column h-100">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="fw-bold mb-0 text-purple-600">Order Summary</h5>
                         <button class="btn btn-sm btn-light text-danger rounded-pill px-3 fw-bold" onclick="clearCart()">Reset</button>
                     </div>
+
+                    @if(!empty($bookingInfo))
+                    <div class="alert alert-warning border-0 shadow-sm rounded-4 p-3 mb-3 bg-warning bg-opacity-25" id="bookingBanner">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="badge bg-purple-600 text-dark rounded-pill mb-1">Reservasi Kedatangan</span>
+                                <div class="fw-bold text-purple-900" style="font-size: 0.95rem;">{{ $bookingInfo['kode'] }}</div>
+                                <div class="small text-dark fw-bold opacity-75">Pelanggan: <span class="text-purple-700">{{ $bookingInfo['nama'] }}</span></div>
+                            </div>
+                            <div class="bg-warning p-2 rounded-3 text-white">
+                                <i class="bi bi-calendar2-check-fill fs-3"></i>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
 
                     <!-- Cart Items Wrapper -->
                     <div class="cart-items-wrapper">
@@ -199,7 +214,25 @@
 @section('scripts')
 <script>
     let cart = [];
-    let totalValue = 0; // Renamed to avoid confusion with potential DOM elements
+    let totalValue = 0;
+    let currentBookingId = @json($bookingInfo['id'] ?? null);
+
+    // Auto load menu if coming from booking
+    @if(!empty($bookingInfo) && !empty($bookingInfo['item_ids']))
+        const allMenusList = @json($menus);
+        const bookedItemIds = @json($bookingInfo['item_ids']);
+
+        bookedItemIds.forEach(id => {
+            const menu = allMenusList.find(m => m.id_m == id);
+            if (menu) {
+                cart.push({...menu});
+            }
+        });
+    @endif
+
+    document.addEventListener('DOMContentLoaded', function() {
+        updateCartUI();
+    });
 
     // Add to cart function
     function addToCart(menu) {
@@ -216,6 +249,9 @@
     // Clear cart
     function clearCart() {
         cart = [];
+        currentBookingId = null;
+        const banner = document.getElementById('bookingBanner');
+        if (banner) banner.remove();
         document.getElementById('inputBayar').value = '';
         updateCartUI();
     }
@@ -336,6 +372,7 @@
             items: cart.map(item => ({ id_m: item.id_m })),
             total_bayar: totalValue,
             bayar: bayar,
+            booking_id: currentBookingId,
             _token: '{{ csrf_token() }}'
         };
 

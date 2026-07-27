@@ -22,6 +22,7 @@ Route::get('/', [LandingPageController::class, 'index'])->name('landing');
 // Public Reservasi Routes
 Route::post('/reservasi', [ReservasiController::class, 'store'])->name('reservasi.store');
 Route::get('/reservasi/cek', [ReservasiController::class, 'cekStatus'])->name('reservasi.cek');
+Route::get('/reservasi/{id}/download', [ReservasiController::class, 'downloadBukti'])->name('reservasi.download');
 
 // Auth Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');

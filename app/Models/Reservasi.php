@@ -24,6 +24,7 @@ class Reservasi extends Model
         'tanggal_reservasi',
         'jam_reservasi',
         'catatan',
+        'catatan_admin',
         'status',
     ];
 
@@ -67,6 +68,8 @@ class Reservasi extends Model
                 return '<span class="badge bg-success"><i class="bi bi-check2-all me-1"></i>Selesai</span>';
             case 'Dibatalkan':
                 return '<span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Dibatalkan</span>';
+            case 'Ditolak':
+                return '<span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25"><i class="bi bi-slash-circle me-1"></i>Ditolak</span>';
             default:
                 return '<span class="badge bg-secondary">' . $this->status . '</span>';
         }

@@ -40,12 +40,14 @@ class ReservasiController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
-            'status' => 'required|in:Menunggu,Disetujui,Selesai,Dibatalkan',
+            'status' => 'required|in:Menunggu,Disetujui,Selesai,Dibatalkan,Ditolak',
+            'catatan_admin' => 'nullable|string|max:500',
         ]);
 
         $reservasi = Reservasi::findOrFail($id);
         $reservasi->update([
             'status' => $request->status,
+            'catatan_admin' => $request->status === 'Ditolak' ? $request->catatan_admin : $reservasi->catatan_admin,
         ]);
 
         return redirect()->back()->with('success', 'Status reservasi ' . $reservasi->kode_reservasi . ' berhasil diperbarui ke ' . $request->status);

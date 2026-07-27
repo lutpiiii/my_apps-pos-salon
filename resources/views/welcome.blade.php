@@ -325,7 +325,7 @@
 <div class="modal fade" id="modalCekBooking" tabindex="-1" aria-labelledby="modalCekBookingLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg" style="border-radius: 24px; overflow: hidden;">
-            <div class="modal-header bg-dark text-white p-4">
+            <div class="modal-header text-white p-4" style="background: linear-gradient(135deg, #4c1d95, #7e22ce);">
                 <h5 class="modal-title fw-bold text-white" id="modalCekBookingLabel"><i class="bi bi-search me-2 text-warning"></i> Cek Status Reservasi</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -543,7 +543,12 @@
                                 <span class="text-purple-600">${data.data.total_harga}</span>
                             </div>
                         </div>
-                        <p class="small text-muted mb-0">Simpan Kode Reservasi Anda untuk pemeriksaan kedatangan.</p>
+                        <div class="d-grid gap-2 mb-3">
+                            <a href="/reservasi/${data.data.kode_reservasi}/download" class="btn btn-purple rounded-pill py-2">
+                                <i class="bi bi-file-earmark-pdf me-2"></i> Unduh Bukti PDF
+                            </a>
+                        </div>
+                        <p class="small text-muted mb-0">Simpan Kode Reservasi Anda atau unduh bukti di atas.</p>
                     `,
                     confirmButtonText: '<i class="bi bi-whatsapp me-1"></i> Konfirmasi ke WhatsApp',
                     confirmButtonColor: '#25D366',
@@ -553,7 +558,7 @@
                     borderRadius: '20px'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        const waText = `Halo NH Beauty Salon, saya ingin konfirmasi reservasi dengan Kode Booking *${data.data.kode_reservasi}* atas nama *${data.data.nama}* untuk tanggal ${data.data.tanggal} jam ${data.data.jam} WIB.${waItemsText}%0A*Total: ${data.data.total_harga}*`;
+                        const waText = `Halo NH Beauty Salon, saya ingin konfirmasi reservasi dengan Kode Booking *${data.data.kode_reservasi}* atas name *${data.data.nama}* untuk tanggal ${data.data.tanggal} jam ${data.data.jam} WIB.${waItemsText}%0A*Total: ${data.data.total_harga}*`;
                         window.open(`https://wa.me/{{ preg_replace('/[^0-9]/', '', $profile->notelp_prf ?? '628993959351') }}?text=${waText}`, '_blank');
                     }
                 });
@@ -605,9 +610,20 @@
                             </div>
                             <div class="small text-muted mb-1"><strong>${item.nama}</strong></div>
                             <div class="my-2">${itemsBadge}</div>
-                            <div class="d-flex justify-content-between align-items-center border-top pt-2 small text-secondary">
-                                <span><i class="bi bi-clock me-1"></i> ${item.tanggal} @ ${item.jam} WIB</span>
-                                <strong class="text-purple-700 fs-6">${item.total_harga}</strong>
+                            ${item.status === 'Ditolak' ? `
+                                <div class="bg-danger bg-opacity-10 p-2 rounded-3 border-start border-3 border-danger mb-2">
+                                    <div class="extra-small text-danger fw-bold text-uppercase" style="font-size: 0.6rem;">Alasan Penolakan:</div>
+                                    <div class="small text-dark italic">"${item.catatan_admin || 'Jadwal bertumpuk / alasan teknis.'}"</div>
+                                </div>
+                            ` : ''}
+                            <div class="d-flex justify-content-between align-items-center border-top pt-2 mt-2">
+                                <span class="small text-secondary"><i class="bi bi-clock me-1"></i> ${item.tanggal} @ ${item.jam} WIB</span>
+                                <div class="d-flex align-items-center gap-2">
+                                    <strong class="text-purple-700 fs-6 me-2">${item.total_harga}</strong>
+                                    <a href="/reservasi/${item.kode}/download" class="btn btn-sm btn-outline-purple rounded-pill px-3">
+                                        <i class="bi bi-file-earmark-pdf me-1"></i> Bukti PDF
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     `;
@@ -621,6 +637,12 @@
         .catch(() => {
             container.innerHTML = '<div class="alert alert-danger rounded-3 small mb-0">Gagal mengambil data reservasi.</div>';
         });
+    });
+
+    // Reset Modal Cek Reservasi when closed
+    document.getElementById('modalCekBooking').addEventListener('hidden.bs.modal', function () {
+        document.getElementById('inputQueryCek').value = '';
+        document.getElementById('hasilCekBooking').innerHTML = '<p class="text-muted small text-center">Masukkan Kode Reservasi (misal: RSV-20260724-XXXX) atau Nomor Telepon Anda.</p>';
     });
 </script>
 @endsection

@@ -6,6 +6,7 @@ use App\Models\Reservasi;
 use App\Models\Detailreservasi;
 use App\Models\Menulayanan;
 use App\Models\Pengguna;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -154,9 +155,32 @@ class ReservasiController extends Controller
                     'tanggal' => date('d F Y', strtotime($item->tanggal_reservasi)),
                     'jam' => date('H:i', strtotime($item->jam_reservasi)),
                     'status' => $item->status,
+                    'catatan_admin' => $item->catatan_admin,
                     'badge' => $item->status_badge,
                 ];
             })
         ]);
+    }
+
+    public function downloadBukti($id)
+    {
+        try {
+            // Check if ID is a reservation code (RSV-...) or a numeric/encrypted ID
+            if (strpos($id, 'RSV-') === 0) {
+                $reservasi = Reservasi::with(['details.menu', 'menu'])->where('kode_reservasi', $id)->firstOrFail();
+            } elseif (strlen($id) > 20) {
+                $originalEncrypted = str_replace(['-', '_'], ['+', '/'], $id);
+                $decryptedId = \Illuminate\Support\Facades\Crypt::decryptString($originalEncrypted);
+                $reservasi = Reservasi::with(['details.menu', 'menu'])->findOrFail($decryptedId);
+            } else {
+                $reservasi = Reservasi::with(['details.menu', 'menu'])->findOrFail($id);
+            }
+
+            $pdf = Pdf::loadView('reservasi.bukti_pdf', compact('reservasi'));
+
+            return $pdf->download('Bukti_Reservasi_' . $reservasi->kode_reservasi . '.pdf');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal mengunduh bukti reservasi: ' . $e->getMessage());
+        }
     }
 }

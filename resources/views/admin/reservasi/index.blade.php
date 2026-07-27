@@ -53,6 +53,20 @@
         border: none;
         overflow: hidden;
     }
+
+    /* FIX FOR DROPDOWN OVERLAP */
+    .table-responsive {
+        overflow: visible !important;
+    }
+    .table-luxury tr {
+        position: relative;
+    }
+    .table-luxury tr:hover {
+        z-index: 5;
+    }
+    .dropdown.show {
+        z-index: 1050;
+    }
 </style>
 @endsection
 
@@ -168,15 +182,49 @@
                                 </button>
 
                                 <div class="dropdown">
-                                    <button class="btn btn-sm btn-light rounded-pill dropdown-toggle" data-bs-toggle="dropdown">Status</button>
+                                    <button class="btn btn-sm btn-light rounded-pill dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Status
+                                    </button>
                                     <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-4">
-                                        <li><form action="{{ route('admin.reservasi.updateStatus', $item->id_r) }}" method="POST">@csrf @method('PUT') <input type="hidden" name="status" value="Disetujui"> <button type="submit" class="dropdown-item py-2 text-info"><i class="bi bi-check-circle me-2"></i> Disetujui</button></form></li>
-                                        <li><form action="{{ route('admin.reservasi.updateStatus', $item->id_r) }}" method="POST">@csrf @method('PUT') <input type="hidden" name="status" value="Selesai"> <button type="submit" class="dropdown-item py-2 text-success"><i class="bi bi-check2-all me-2"></i> Selesai</button></form></li>
-                                        <li><form action="{{ route('admin.reservasi.updateStatus', $item->id_r) }}" method="POST">@csrf @method('PUT') <input type="hidden" name="status" value="Dibatalkan"> <button type="submit" class="dropdown-item py-2 text-warning"><i class="bi bi-x-circle me-2"></i> Dibatalkan</button></form></li>
+                                        <li>
+                                            <form action="{{ route('admin.reservasi.updateStatus', $item->id_r) }}" method="POST">
+                                                @csrf
+                                                @method('PUT')
+                                                <input type="hidden" name="status" value="Disetujui">
+                                                <button type="submit" class="dropdown-item py-2 text-info">
+                                                    <i class="bi bi-check-circle me-2"></i> Disetujui
+                                                </button>
+                                            </form>
+                                        </li>
+                                        <li>
+                                            <form action="{{ route('admin.reservasi.updateStatus', $item->id_r) }}" method="POST">
+                                                @csrf
+                                                @method('PUT')
+                                                <input type="hidden" name="status" value="Selesai">
+                                                <button type="submit" class="dropdown-item py-2 text-success">
+                                                    <i class="bi bi-check2-all me-2"></i> Selesai
+                                                </button>
+                                            </form>
+                                        </li>
+                                        <li>
+                                            <form action="{{ route('admin.reservasi.updateStatus', $item->id_r) }}" method="POST">
+                                                @csrf
+                                                @method('PUT')
+                                                <input type="hidden" name="status" value="Dibatalkan">
+                                                <button type="submit" class="dropdown-item py-2 text-warning">
+                                                    <i class="bi bi-x-circle me-2"></i> Dibatalkan
+                                                </button>
+                                            </form>
+                                        </li>
+                                        <li>
+                                            <button type="button" class="dropdown-item py-2 text-danger" onclick="rejectReservation({{ $item->id_r }}, '{{ $item->kode_reservasi }}')">
+                                                <i class="bi bi-slash-circle me-2"></i> Tolak
+                                            </button>
+                                        </li>
                                     </ul>
                                 </div>
 
-                                @if($item->status != 'Selesai' && $item->status != 'Dibatalkan')
+                                @if($item->status != 'Selesai' && $item->status != 'Dibatalkan' && $item->status != 'Ditolak')
                                     <a href="{{ route('admin.reservasi.kasir', $item->id_r) }}" class="btn btn-sm btn-success rounded-pill px-3">
                                         <i class="bi bi-cart-plus"></i>
                                     </a>
@@ -284,10 +332,17 @@
                     <p class="mb-0 italic small">"{{ $item->catatan }}"</p>
                 </div>
                 @endif
+
+                @if($item->catatan_admin)
+                <div class="mt-3 p-3 bg-danger bg-opacity-10 rounded-4 border-start border-4 border-danger">
+                    <div class="small text-danger fw-bold text-uppercase mb-1">Alasan Penolakan</div>
+                    <p class="mb-0 italic small text-danger">"{{ $item->catatan_admin }}"</p>
+                </div>
+                @endif
             </div>
             <div class="modal-footer border-0 p-4 pt-0">
                 <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>
-                @if($item->status != 'Selesai' && $item->status != 'Dibatalkan')
+                @if($item->status != 'Selesai' && $item->status != 'Dibatalkan' && $item->status != 'Ditolak')
                     <a href="{{ route('admin.reservasi.kasir', $item->id_r) }}" class="btn btn-purple-refined px-4">
                         <i class="bi bi-cart-plus me-2"></i> Proses ke Kasir
                     </a>
@@ -297,5 +352,68 @@
     </div>
 </div>
 @endforeach
+@endsection
 
+@section('scripts')
+<script>
+    function rejectReservation(id, code) {
+        Swal.fire({
+            title: 'Tolak Reservasi?',
+            text: `Berikan alasan penolakan untuk booking ${code}:`,
+            input: 'textarea',
+            inputPlaceholder: 'Contoh: Maaf, jadwal penuh di jam tersebut. Silakan pilih waktu lain.',
+            inputAttributes: {
+                'aria-label': 'Alasan penolakan'
+            },
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#94a3b8',
+            confirmButtonText: 'Ya, Tolak',
+            cancelButtonText: 'Batal',
+            showLoaderOnConfirm: true,
+            preConfirm: (reason) => {
+                if (!reason) {
+                    Swal.showValidationMessage('Alasan penolakan wajib diisi!');
+                }
+                return reason;
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Create a dynamic form to submit
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/admin/reservasi/${id}/status`;
+
+                const csrfToken = document.createElement('input');
+                csrfToken.type = 'hidden';
+                csrfToken.name = '_token';
+                csrfToken.value = '{{ csrf_token() }}';
+
+                const methodField = document.createElement('input');
+                methodField.type = 'hidden';
+                methodField.name = '_method';
+                methodField.value = 'PUT';
+
+                const statusField = document.createElement('input');
+                statusField.type = 'hidden';
+                statusField.name = 'status';
+                statusField.value = 'Ditolak';
+
+                const reasonField = document.createElement('input');
+                reasonField.type = 'hidden';
+                reasonField.name = 'catatan_admin';
+                reasonField.value = result.value;
+
+                form.appendChild(csrfToken);
+                form.appendChild(methodField);
+                form.appendChild(statusField);
+                form.appendChild(reasonField);
+
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
+    }
+</script>
 @endsection

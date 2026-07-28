@@ -17,7 +17,7 @@ use App\Http\Controllers\Kasir\DashboardController as KasirDashboardController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [LandingPageController::class, 'index'])->name('landing');
+Route::get('/', [LandingPageController::class, 'index'])->name('landing')->middleware('prevent-back-history');
 
 // Public Reservasi Routes
 Route::post('/reservasi', [ReservasiController::class, 'store'])->name('reservasi.store');
@@ -25,44 +25,14 @@ Route::get('/reservasi/cek', [ReservasiController::class, 'cekStatus'])->name('r
 Route::get('/reservasi/{id}/download', [ReservasiController::class, 'downloadBukti'])->name('reservasi.download');
 
 // Auth Routes
-Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login')->middleware('prevent-back-history');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Dashboard Routes (Prefix is used to separate UI)
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
+// Dashboard & Management Routes (Admin Only)
+Route::middleware(['auth', 'role:admin', 'prevent-back-history'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
-});
 
-Route::middleware(['auth', 'role:kasir'])->prefix('kasir')->group(function () {
-    Route::get('/dashboard', [KasirDashboardController::class, 'index'])->name('kasir.dashboard');
-});
-
-// Shared Admin Features (Prefix 'admin' for consistent URLs, available to both Admin & Kasir)
-Route::middleware(['auth', 'role:admin,kasir'])->prefix('admin')->group(function () {
-    // Kasir POS
-    Route::get('/kasir', [KasirController::class, 'index'])->name('admin.kasir.index');
-    Route::post('/kasir', [KasirController::class, 'store'])->name('admin.kasir.store');
-
-    // Reservasi (Shared for Admin & Kasir)
-    Route::get('/reservasi', [AdminReservasiController::class, 'index'])->name('admin.reservasi.index');
-    Route::put('/reservasi/{id}/status', [AdminReservasiController::class, 'updateStatus'])->name('admin.reservasi.updateStatus');
-    Route::delete('/reservasi/{id}', [AdminReservasiController::class, 'destroy'])->name('admin.reservasi.destroy');
-    Route::get('/reservasi/{id}/kasir', [AdminReservasiController::class, 'prosesKeKasir'])->name('admin.reservasi.kasir');
-
-    // Riwayat & Laporan
-    Route::get('/riwayat', [TransaksiController::class, 'riwayat'])->name('admin.riwayat.index');
-    Route::get('/laporan/masuk', [TransaksiController::class, 'laporanMasuk'])->name('admin.laporan.masuk');
-    Route::get('/transaksi/{id}', [TransaksiController::class, 'show'])->name('admin.transaksi.show');
-    Route::get('/transaksi/{id}/cetak', [TransaksiController::class, 'cetakStruk'])->name('admin.transaksi.cetak');
-
-    // Profile Pribadi
-    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
-    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
-});
-
-// Admin-Only Management Features
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     // Kategori
     Route::get('/kategori', [KategoriController::class, 'index'])->name('admin.kategori.index');
     Route::post('/kategori', [KategoriController::class, 'store'])->name('admin.kategori.store');
@@ -78,6 +48,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     // Laporan Keluar
     Route::get('/laporan/keluar', [LaporanKeluarController::class, 'index'])->name('admin.laporan.keluar');
     Route::post('/laporan/keluar', [LaporanKeluarController::class, 'store'])->name('admin.laporan.keluar.store');
+    // Note: 'destroy' is not usually standard for reports, but matches user's request/original
     Route::delete('/laporan/keluar/{id}', [LaporanKeluarController::class, 'destroy'])->name('admin.laporan.keluar.destroy');
 
     // Kelola Salon
@@ -93,4 +64,32 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::post('/pengguna', [PenggunaController::class, 'store'])->name('admin.pengguna.store');
     Route::put('/pengguna/{id}', [PenggunaController::class, 'update'])->name('admin.pengguna.update');
     Route::delete('/pengguna/{id}', [PenggunaController::class, 'destroy'])->name('admin.pengguna.destroy');
+});
+
+// Dashboard Routes (Kasir Only)
+Route::middleware(['auth', 'role:kasir', 'prevent-back-history'])->prefix('kasir')->group(function () {
+    Route::get('/dashboard', [KasirDashboardController::class, 'index'])->name('kasir.dashboard');
+});
+
+// Shared Features (Admin & Kasir)
+Route::middleware(['auth', 'role:admin,kasir', 'prevent-back-history'])->prefix('admin')->group(function () {
+    // Kasir POS
+    Route::get('/kasir', [KasirController::class, 'index'])->name('admin.kasir.index');
+    Route::post('/kasir', [KasirController::class, 'store'])->name('admin.kasir.store');
+
+    // Reservasi
+    Route::get('/reservasi', [AdminReservasiController::class, 'index'])->name('admin.reservasi.index');
+    Route::put('/reservasi/{id}/status', [AdminReservasiController::class, 'updateStatus'])->name('admin.reservasi.updateStatus');
+    Route::delete('/reservasi/{id}', [AdminReservasiController::class, 'destroy'])->name('admin.reservasi.destroy');
+    Route::get('/reservasi/{id}/kasir', [AdminReservasiController::class, 'prosesKeKasir'])->name('admin.reservasi.kasir');
+
+    // Riwayat & Laporan Masuk
+    Route::get('/riwayat', [TransaksiController::class, 'riwayat'])->name('admin.riwayat.index');
+    Route::get('/laporan/masuk', [TransaksiController::class, 'laporanMasuk'])->name('admin.laporan.masuk');
+    Route::get('/transaksi/{id}', [TransaksiController::class, 'show'])->name('admin.transaksi.show');
+    Route::get('/transaksi/{id}/cetak', [TransaksiController::class, 'cetakStruk'])->name('admin.transaksi.cetak');
+
+    // Profile Pribadi
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });

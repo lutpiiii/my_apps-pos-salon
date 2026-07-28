@@ -14,7 +14,7 @@ class RoleMiddleware
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
-     * @param  string  $role
+     * @param  string[]  ...$roles
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function handle(Request $request, Closure $next, ...$roles): Response
@@ -25,8 +25,12 @@ class RoleMiddleware
 
         $user = Auth::user();
 
-        if (!in_array($user->role_p, $roles)) {
-            abort(403, 'Unauthorized action.');
+        // Memastikan pengecekan role tidak sensitif terhadap huruf besar/kecil (admin vs Admin)
+        $userRole = strtolower($user->role_p);
+        $allowedRoles = array_map('strtolower', $roles);
+
+        if (!in_array($userRole, $allowedRoles)) {
+            abort(403, 'Unauthorized. Role user: ' . $user->role_p);
         }
 
         return $next($request);

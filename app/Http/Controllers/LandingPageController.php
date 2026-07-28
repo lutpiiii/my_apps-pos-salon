@@ -13,6 +13,16 @@ class LandingPageController extends Controller
 {
     public function index(Request $request)
     {
+        // Jika user sudah login, arahkan langsung ke dashboard sesuai role
+        if (auth()->check()) {
+            $user = auth()->user();
+            if (strtolower($user->role_p) === 'admin') {
+                return redirect()->route('admin.dashboard');
+            } elseif (strtolower($user->role_p) === 'kasir') {
+                return redirect()->route('kasir.dashboard');
+            }
+        }
+
         $profile = Profilesalon::first();
         $informasi = Infosalon::all();
         $categories = Kategorilayanan::where('is_deleted', false)->get();

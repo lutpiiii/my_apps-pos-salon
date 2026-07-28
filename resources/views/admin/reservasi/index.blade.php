@@ -225,7 +225,7 @@
                                 </div>
 
                                 @if($item->status != 'Selesai' && $item->status != 'Dibatalkan' && $item->status != 'Ditolak')
-                                    <a href="{{ route('admin.reservasi.kasir', $item->id_r) }}" class="btn btn-sm btn-success rounded-pill px-3">
+                                    <a href="{{ route('admin.reservasi.kasir', $item->id_r) }}" class="btn btn-sm btn-light text-success rounded-circle btn-success">
                                         <i class="bi bi-cart-plus"></i>
                                     </a>
                                 @endif

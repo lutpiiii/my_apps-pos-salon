@@ -165,6 +165,17 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     // Global SweetAlert Handler
+    @if(session('success_login'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Login Berhasil!',
+            text: "{{ session('success_login') }}",
+            timer: 3000,
+            showConfirmButton: false,
+            borderRadius: '20px'
+        });
+    @endif
+
     @if(session('success'))
         Swal.fire({
             icon: 'success',

@@ -11,12 +11,14 @@ class AuthController extends Controller
 {
     public function showLogin()
     {
-        // Jika user sudah login, arahkan langsung sesuai role nya
+        // Jika user sudah login, arahkan langsung ke dashboard sesuai role
         if (Auth::check()) {
             $user = Auth::user();
-            if ($user->role_p === 'admin') {
+            $role = strtolower($user->role_p);
+
+            if ($role === 'admin') {
                 return redirect()->route('admin.dashboard');
-            } elseif ($user->role_p === 'kasir') {
+            } elseif ($role === 'kasir') {
                 return redirect()->route('kasir.dashboard');
             }
         }
@@ -49,10 +51,12 @@ class AuthController extends Controller
                 Auth::login($user);
                 $request->session()->regenerate();
 
-                if ($user->role_p === 'admin') {
-                    return redirect()->route('admin.dashboard');
-                } elseif ($user->role_p === 'kasir') {
-                    return redirect()->route('kasir.dashboard');
+                $role = strtolower($user->role_p);
+
+                if ($role === 'admin') {
+                    return redirect()->route('admin.dashboard')->with('success_login', 'Selamat Datang Kembali, ' . $user->nama_p . '!');
+                } elseif ($role === 'kasir') {
+                    return redirect()->route('kasir.dashboard')->with('success_login', 'Selamat Datang Kembali, ' . $user->nama_p . '!');
                 }
 
                 Auth::logout();
@@ -60,9 +64,7 @@ class AuthController extends Controller
             }
         }
 
-        return back()->withErrors([
-            'username_p' => 'Username atau password salah.',
-        ])->onlyInput('username_p');
+        return back()->with('error_login', 'Username atau password salah.')->onlyInput('username_p');
     }
 
     public function logout(Request $request)

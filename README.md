@@ -1,62 +1,84 @@
-# NH Beauty Salon - Sistem Manajemen Laravel
+# NH Beauty Salon - Sistem Manajemen & POS (Laravel 12)
 
-Sistem Manajemen Salon & POS profesional yang dimigrasi dari PHP Native ke Laravel, menampilkan tema ungu mewah, analitik real-time, dan pelaporan lanjutan.
-
-## 🚀 Pembaruan & Fitur Terbaru (Log Perubahan Hari Ini)
-
-### 1. Keamanan & Autentikasi (Auth)
-*   **File**: `app/Http/Controllers/AuthController.php`
-    *   **L38 - L45**: Menambahkan dukungan password legacy untuk password teks biasa dari PHP Native.
-    *   **L48 - L52**: Mengimplementasikan pengalihan otomatis berdasarkan peran (`admin` vs `kasir`).
-
-### 2. Dashboard Admin Lanjutan
-*   **File**: `app/Http/Controllers/Admin/DashboardController.php` (**BARU**)
-    *   **L19 - L31**: Pengambilan statistik real-time (Pendapatan, Transaksi, Layanan Aktif).
-    *   **L37 - L42**: Logika dinamis "Layanan Terlaris" berdasarkan data penjualan aktual.
-    *   **L46 - L52**: Pemrosesan data tren penjualan 7 hari terakhir.
-*   **File**: `resources/views/admin/dashboard.blade.php`
-    *   **L104 - L150**: Integrasi **Chart.js** untuk diagram penjualan mingguan yang interaktif.
-    *   **L13 - L34**: Kartu Selamat Datang gradasi mewah dengan tampilan tanggal dinamis.
-
-### 3. UI & UX Manajemen (Menu & Kategori)
-*   **File**: `resources/views/admin/menu/index.blade.php` & `kategori/index.blade.php`
-    *   **L1 - L25**: Mengganti tabel lama dengan **Kartu Grid Interaktif Modern**.
-    *   **L40 - L55**: Mengintegrasikan **Bilah Pencarian** dan **Filter Kategori** (untuk Menu).
-    *   **L140 (Menu)**: Peningkatan Badge Kategori dengan kontras tinggi dan garis tepi untuk keterbacaan di perangkat seluler.
-
-### 4. Pelaporan & Riwayat
-*   **File**: `app/Http/Controllers/Admin/TransaksiController.php`
-    *   **L18 - L25**: Penyaringan otomatis berdasarkan peran untuk Riwayat (Kasir hanya melihat data mereka sendiri).
-    *   **L48 - L56**: Implementasi Filter 3-in-1 (**Harian, Rentang Tanggal, Tahunan**).
-    *   **L105 - L120**: **Enkripsi ID** menggunakan Laravel Crypt untuk URL yang aman (menyembunyikan kunci utama numerik).
-*   **File**: `resources/views/admin/laporan/masuk.blade.php`
-    *   **L100 - L115**: Toggle filter JS dinamis tanpa penyegaran halaman.
-
-### 5. Pencetakan & Ekspor
-*   **File**: `app/Exports/LaporanMasukExport.php` (**BARU**)
-    *   **L1 - L50**: Ekspor Excel profesional menggunakan **Maatwebsite/Laravel-Excel**.
-*   **File**: `resources/views/admin/kasir/struk.blade.php` (**BARU**)
-    *   **L1 - L70**: Tata letak struk siap cetak yang dioptimalkan untuk **Printer Thermal 58mm**.
-
-### 6. Penyempurnaan UI Global
-*   **File**: `public/css/dashboard-refined.css` (**BARU**)
-    *   **L1 - L250**: Sistem gaya premium terkonsolidasi untuk semua dashboard.
-*   **File**: `resources/views/layouts/dashboard/admin.blade.php`
-    *   **L140 - L155**: Integrasi **SweetAlert2** untuk notifikasi profesional dan konfirmasi penghapusan.
-    *   **L125 - L138**: Memperbaiki bug Sidebar Seluler dengan tombol Tutup dan logika Overlay.
-
-### 7. Peningkatan Unggahan File
-*   **File**: `app/Http/Controllers/Admin/GalleryController.php`
-    *   **L24 - L30**: Manajemen direktori otomatis untuk mencegah kesalahan "Unable to write".
-    *   **L45 - L50**: Pembersihan server otomatis (menghapus file lama saat pembaruan/penghapusan).
+Aplikasi manajemen operasional salon kecantikan yang mencakup sistem Reservasi Online, Point of Sales (Kasir), Manajemen Menu/Layanan, dan Laporan Keuangan.
 
 ---
 
-## 🛠 Teknologi Utama
-*   **Framework**: Laravel 11.x
-*   **Database**: MySQL
-*   **UI**: Bootstrap 5, AOS (Animasi), Chart.js, SweetAlert2
-*   **Library**: Laravel Excel, DomPDF
+## 🛠️ Persyaratan Sistem
+Sebelum memindahkan aplikasi ke komputer lain, pastikan perangkat tersebut sudah memiliki:
+*   **PHP Version**: Minimal **8.2** (Wajib, karena menggunakan Laravel 12).
+*   **Web Server**: XAMPP (dengan PHP 8.2), Laragon, atau Nginx.
+*   **Database**: MySQL / MariaDB.
+*   **Composer**: Untuk mengelola library PHP.
 
-## 📝 Catatan Pengembang
-Sistem sekarang sepenuhnya responsif dan dioptimalkan untuk perangkat Desktop, Tablet, dan Android. Semua transaksi menggunakan ID terenkripsi yang aman di frontend sambil mempertahankan logika backend yang andal.
+---
+
+## 🚀 Langkah-langkah Menjalankan di Komputer Baru
+
+Ikuti urutan langkah di bawah ini agar aplikasi berjalan tanpa error:
+
+### 1. Persiapan Folder & Database
+1.  Copy seluruh folder project ke komputer baru.
+2.  Buat database baru di **phpMyAdmin** dengan nama (misal: `pos-salon`).
+3.  Import file database SQL (jika ada) ke database baru tersebut.
+
+### 2. Konfigurasi Environment (`.env`)
+1.  Cek apakah file `.env` sudah ada. Jika belum, copy dari `.env.example` dan ubah namanya menjadi `.env`.
+2.  Sesuaikan pengaturan database di file `.env`:
+    ```env
+    DB_CONNECTION=mysql
+    DB_HOST=127.0.0.1
+    DB_PORT=3306
+    DB_DATABASE=nama_database_anda
+    DB_USERNAME=root
+    DB_PASSWORD=
+    ```
+
+### 3. Instalasi Library & Inisialisasi
+Buka terminal (CMD / PowerShell / Git Bash) di dalam folder project, lalu jalankan perintah berikut secara berurutan:
+
+```bash
+# 1. Install semua library yang diperlukan
+composer install
+
+# 2. Generate kunci keamanan aplikasi (Wajib agar login tidak error)
+php artisan key:generate
+
+# 3. Hubungkan folder penyimpanan gambar
+php artisan storage:link
+
+# 4. Bersihkan cache dari komputer lama
+php artisan optimize:clear
+```
+
+### 4. Perbaikan Izin Akses Folder (Wajib di Windows)
+Agar fitur **Upload Gambar** dan **Login** lancar, lakukan langkah ini:
+1.  Masuk ke folder `public/assets/`.
+2.  Jika folder `uploads` belum ada, buat manual.
+3.  **Klik Kanan** folder `uploads` -> **Properties**.
+4.  Hilangkan centang **Read-only**.
+5.  Masuk ke tab **Security** -> Klik **Edit** -> Pilih user **Everyone** (tambah jika belum ada) -> Centang **Full Control**.
+
+### 5. Menjalankan Aplikasi
+Terakhir, jalankan server Laravel:
+```bash
+php artisan serve
+```
+Buka browser dan akses: `http://127.0.0.1:8000`
+
+---
+
+## 🔑 Akun Akses Default
+*   **Admin**: `admin` | Password: `admin` (Atau sesuai data di database Anda).
+*   **Kasir**: `kasir` | Password: `kasir`.
+
+---
+
+## 🛠️ Tips Jika Terjadi Error
+*   **Error 419 Page Expired**: Jalankan `php artisan key:generate` dan `php artisan config:clear`.
+*   **Gambar Tidak Muncul**: Pastikan sudah menjalankan `php artisan storage:link`.
+*   **Sidebar Tertukar**: Jalankan `php artisan view:clear`.
+*   **Error Database (Column not found)**: Pastikan file SQL yang di-import adalah versi terbaru.
+
+---
+*Glow Up with Us! - NH Beauty Salon Development Team*

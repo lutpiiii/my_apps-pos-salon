@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\KategoriController;
 use App\Http\Controllers\Admin\MenuController;
 use App\Http\Controllers\Admin\KasirController;
+use App\Http\Controllers\Admin\MidtransController;
 use App\Http\Controllers\Admin\TransaksiController;
 use App\Http\Controllers\Admin\LaporanKeluarController;
 use App\Http\Controllers\Admin\ProfileSalonController;
@@ -77,6 +78,9 @@ Route::middleware(['auth', 'role:admin,kasir', 'prevent-back-history'])->prefix(
     Route::get('/kasir', [KasirController::class, 'index'])->name('admin.kasir.index');
     Route::post('/kasir', [KasirController::class, 'store'])->name('admin.kasir.store');
 
+    // Midtrans Status Check
+    Route::get('/midtrans/status/{orderId}', [MidtransController::class, 'checkStatus'])->name('midtrans.status');
+
     // Reservasi
     Route::get('/reservasi', [AdminReservasiController::class, 'index'])->name('admin.reservasi.index');
     Route::put('/reservasi/{id}/status', [AdminReservasiController::class, 'updateStatus'])->name('admin.reservasi.updateStatus');
@@ -93,3 +97,6 @@ Route::middleware(['auth', 'role:admin,kasir', 'prevent-back-history'])->prefix(
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
+
+// Midtrans Callback (Public)
+Route::post('/midtrans/callback', [MidtransController::class, 'callback']);

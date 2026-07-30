@@ -19,8 +19,7 @@ Ikuti urutan langkah di bawah ini agar aplikasi berjalan tanpa error:
 
 ### 1. Persiapan Folder & Database
 1.  Copy seluruh folder project ke komputer baru.
-2.  Buat database baru di **phpMyAdmin** dengan nama (misal: `pos-salon`).
-3.  Import file database SQL (jika ada) ke database baru tersebut.
+2.  Buat database baru di **phpMyAdmin** (misal nama database: `pos-salon`).
 
 ### 2. Konfigurasi Environment (`.env`)
 1.  Cek apakah file `.env` sudah ada. Jika belum, copy dari `.env.example` dan ubah namanya menjadi `.env`.
@@ -29,25 +28,31 @@ Ikuti urutan langkah di bawah ini agar aplikasi berjalan tanpa error:
     DB_CONNECTION=mysql
     DB_HOST=127.0.0.1
     DB_PORT=3306
-    DB_DATABASE=nama_database_anda
+    DB_DATABASE=pos-salon
     DB_USERNAME=root
     DB_PASSWORD=
     ```
 
-### 3. Instalasi Library & Inisialisasi
+### 3. Instalasi Library & Inisialisasi Database
 Buka terminal (CMD / PowerShell / Git Bash) di dalam folder project, lalu jalankan perintah berikut secara berurutan:
 
 ```bash
-# 1. Install semua library yang diperlukan
+# 1. Install semua library pendukung
 composer install
 
 # 2. Generate kunci keamanan aplikasi (Wajib agar login tidak error)
 php artisan key:generate
 
-# 3. Hubungkan folder penyimpanan gambar
+# 3. Membuat struktur tabel database secara otomatis (Migrate)
+php artisan migrate
+
+# 4. (Opsional) Memasukkan data awal/dummy jika diperlukan
+# php artisan db:seed
+
+# 5. Hubungkan folder penyimpanan gambar
 php artisan storage:link
 
-# 4. Bersihkan cache dari komputer lama
+# 6. Bersihkan cache dari komputer lama
 php artisan optimize:clear
 ```
 
@@ -69,8 +74,9 @@ Buka browser dan akses: `http://127.0.0.1:8000`
 ---
 
 ## 🔑 Akun Akses Default
-*   **Admin**: `admin` | Password: `admin` (Atau sesuai data di database Anda).
-*   **Kasir**: `kasir` | Password: `kasir`.
+Jika Anda menggunakan data dari *Seeder* atau data bawaan, akun defaultnya adalah:
+*   **Admin**: `admin` | Password: `12345678` (Atau sesuai data awal Anda).
+*   **Kasir**: `kasir` | Password: `12345678`.
 
 ---
 
@@ -78,7 +84,7 @@ Buka browser dan akses: `http://127.0.0.1:8000`
 *   **Error 419 Page Expired**: Jalankan `php artisan key:generate` dan `php artisan config:clear`.
 *   **Gambar Tidak Muncul**: Pastikan sudah menjalankan `php artisan storage:link`.
 *   **Sidebar Tertukar**: Jalankan `php artisan view:clear`.
-*   **Error Database (Column not found)**: Pastikan file SQL yang di-import adalah versi terbaru.
+*   **Database Error**: Pastikan koneksi di `.env` sudah benar dan sudah menjalankan `php artisan migrate`.
 
 ---
 *Glow Up with Us! - NH Beauty Salon Development Team*

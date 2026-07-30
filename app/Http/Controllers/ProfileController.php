@@ -36,7 +36,8 @@ class ProfileController extends Controller
         }
 
         if ($request->hasFile('foto_p')) {
-            $uploadPath = base_path('public/assets/uploads');
+            $uploadPath = public_path('assets/uploads');
+
             if (!file_exists($uploadPath)) {
                 mkdir($uploadPath, 0777, true);
             }
@@ -45,7 +46,7 @@ class ProfileController extends Controller
             if ($user->foto_p) {
                 $oldPath = $uploadPath . DIRECTORY_SEPARATOR . $user->foto_p;
                 if (file_exists($oldPath) && is_file($oldPath)) {
-                    unlink($oldPath);
+                    @unlink($oldPath);
                 }
             }
 
@@ -54,7 +55,6 @@ class ProfileController extends Controller
             $data['foto_p'] = $fileName;
         }
 
-        // We use Pengguna model to update to ensure attributes/setters are called correctly if needed
         Pengguna::where('id_p', $user->id_p)->update($data);
 
         return redirect()->back()->with('success', 'Profil Anda berhasil diperbarui.');

@@ -92,7 +92,7 @@ class SalonqNativeSeeder extends Seeder
         DB::table('pengguna')->insert([
             ['id_p' => 1, 'nama_p' => 'Administrator', 'username_p' => 'admin', 'password_p' => '$2y$10$LAtDPzlToZETX5tDqbFjD.U2ssJqkX5xCkGj62Kqk1nnPjzyXXvYa', 'foto_p' => null, 'role_p' => 'Admin'],
             ['id_p' => 3, 'nama_p' => 'HANA SYAFIYA', 'username_p' => 'hana', 'password_p' => '$2y$10$mEXepZnc8lDODu.BeL59e.PXV9JBMe7HZS.REhtph2vRM6BsuJEM6', 'foto_p' => null, 'role_p' => 'Kasir'],
-            ['id_p' => 4, 'nama_p' => 'elia', 'username_p' => 'elia', 'password_p' => '$2y$10$vOY/rJ1LCxq7jF02VoSsjuot0giKr8HhKNx7GlSOO0QYmcxlsLz8W', 'foto_p' => null, 'role_p' => 'Kasir'],
+            ['id_p' => 4, 'nama_p' => 'KASIR', 'username_p' => 'kasir', 'password_p' => '$2y$10$vOY/rJ1LCxq7jF02VoSsjuot0giKr8HhKNx7GlSOO0QYmcxlsLz8W', 'foto_p' => null, 'role_p' => 'Kasir'],
         ]);
 
         DB::table('transaksikeluar')->insert([

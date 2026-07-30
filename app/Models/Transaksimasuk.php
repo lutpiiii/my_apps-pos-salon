@@ -21,6 +21,10 @@ class Transaksimasuk extends Model
         'totalBayar_t',
         'bayar_t',
         'kembali_t',
+        'metode_pembayaran',
+        'status_pembayaran',
+        'midtrans_order_id',
+        'qr_url',
     ];
 
     protected $casts = [

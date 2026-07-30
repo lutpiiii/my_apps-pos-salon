@@ -82,6 +82,15 @@
         transform: scale(1.02);
         box-shadow: 0 5px 15px rgba(88, 28, 135, 0.05);
     }
+    .btn-outline-purple-refined {
+        border-color: var(--purple-medium);
+        color: var(--purple-main);
+    }
+    .btn-outline-purple-refined:hover, .btn-check:checked + .btn-outline-purple-refined {
+        background-color: var(--purple-main);
+        border-color: var(--purple-main);
+        color: white;
+    }
 </style>
 @endsection
 
@@ -173,13 +182,26 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label text-muted small fw-bold text-uppercase" style="letter-spacing: 1px;">Bayar (Rp)</label>
-                            <input type="number" id="inputBayar" class="form-control form-control-lg rounded-4 border-2 fw-bold text-purple-600" placeholder="0" oninput="calculateChange()">
+                            <label class="form-label text-muted small fw-bold text-uppercase" style="letter-spacing: 1px;">Metode Pembayaran</label>
+                            <div class="d-flex gap-2">
+                                <input type="radio" class="btn-check" name="paymentMethod" id="payTunai" value="Tunai" checked onchange="togglePaymentMethod()">
+                                <label class="btn btn-outline-purple-refined w-50 rounded-4 py-2 fw-bold" for="payTunai">Tunai</label>
+
+                                <input type="radio" class="btn-check" name="paymentMethod" id="payQRIS" value="QRIS" onchange="togglePaymentMethod()">
+                                <label class="btn btn-outline-purple-refined w-50 rounded-4 py-2 fw-bold" for="payQRIS">QRIS</label>
+                            </div>
                         </div>
 
-                        <div class="d-flex justify-content-between mb-4 align-items-center bg-light p-3 rounded-4">
-                            <span class="text-muted small fw-bold">Kembalian</span>
-                            <span class="fw-bold" id="kembalian">Rp 0</span>
+                        <div id="tunaiArea">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small fw-bold text-uppercase" style="letter-spacing: 1px;">Bayar (Rp)</label>
+                                <input type="number" id="inputBayar" class="form-control form-control-lg rounded-4 border-2 fw-bold text-purple-600" placeholder="0" oninput="calculateChange()">
+                            </div>
+
+                            <div class="d-flex justify-content-between mb-4 align-items-center bg-light p-3 rounded-4">
+                                <span class="text-muted small fw-bold">Kembalian</span>
+                                <span class="fw-bold" id="kembalian">Rp 0</span>
+                            </div>
                         </div>
 
                         <button class="btn btn-purple-refined btn-lg w-100 py-3 shadow-sm rounded-4" id="btnCheckout" onclick="processCheckout()" disabled>
@@ -209,6 +231,33 @@
         </div>
     </div>
 </div>
+
+<!-- QRIS Modal -->
+<div class="modal fade" id="qrisModal" data-bs-backdrop="static" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-content-refined shadow-lg border-0">
+            <div class="modal-body p-5 text-center">
+                <h4 class="fw-bold mb-3 text-purple-600">Scan QRIS</h4>
+                <div id="qrisContainer" class="bg-white p-3 rounded-4 mb-3 mx-auto shadow-sm" style="width: 250px; height: 250px; border: 2px solid #f3e8ff;">
+                    <img id="qrisImage" src="" alt="QRIS" class="img-fluid">
+                </div>
+                <p class="text-muted mb-1 small fw-bold text-uppercase">Total Pembayaran:</p>
+                <h3 class="fw-bold text-dark mb-4" id="qrisTotal">Rp 0</h3>
+                <div class="alert alert-purple-light border-0 rounded-4 small mb-4" style="background: var(--purple-ultra-light); color: var(--purple-main);">
+                    <i class="bi bi-info-circle-fill me-2"></i>
+                    Silakan scan QR di atas menggunakan aplikasi bank atau e-wallet Anda.
+                </div>
+                <div class="d-grid gap-2">
+                    <div class="text-center py-2 mb-2" id="qrisStatus">
+                        <div class="spinner-grow spinner-grow-sm text-purple-600 me-2" role="status"></div>
+                        <span class="text-muted small fw-bold">Menunggu pembayaran...</span>
+                    </div>
+                    <button class="btn btn-light rounded-pill py-2 fw-bold text-muted" onclick="cancelQRIS()">Batalkan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('scripts')
@@ -216,6 +265,8 @@
     let cart = [];
     let totalValue = 0;
     let currentBookingId = @json($bookingInfo['id'] ?? null);
+    let pollingInterval = null;
+    let currentOrderId = null;
 
     // Auto load menu if coming from booking
     @if(!empty($bookingInfo) && !empty($bookingInfo['item_ids']))
@@ -306,10 +357,17 @@
 
     // Calculate Change
     function calculateChange() {
+        const payMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+        const btnCheckout = document.getElementById('btnCheckout');
+
+        if (payMethod === 'QRIS') {
+            btnCheckout.disabled = totalValue === 0;
+            return;
+        }
+
         const bayarInput = document.getElementById('inputBayar');
         const bayar = parseFloat(bayarInput.value) || 0;
         const kembalianEl = document.getElementById('kembalian');
-        const btnCheckout = document.getElementById('btnCheckout');
 
         const kembalian = bayar - totalValue;
 
@@ -328,6 +386,18 @@
             kembalianEl.className = 'fw-bold text-muted';
             btnCheckout.disabled = true;
         }
+    }
+
+    function togglePaymentMethod() {
+        const payMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+        const tunaiArea = document.getElementById('tunaiArea');
+
+        if (payMethod === 'QRIS') {
+            tunaiArea.classList.add('d-none');
+        } else {
+            tunaiArea.classList.remove('d-none');
+        }
+        calculateChange();
     }
 
     // Search Filter
@@ -358,8 +428,10 @@
 
     // Checkout Process
     function processCheckout() {
+        const payMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
         const bayar = parseFloat(document.getElementById('inputBayar').value) || 0;
-        if (bayar < totalValue) {
+
+        if (payMethod === 'Tunai' && bayar < totalValue) {
             alert('Pembayaran kurang!');
             return;
         }
@@ -371,8 +443,9 @@
         const data = {
             items: cart.map(item => ({ id_m: item.id_m })),
             total_bayar: totalValue,
-            bayar: bayar,
+            bayar: payMethod === 'Tunai' ? bayar : 0,
             booking_id: currentBookingId,
+            metode_pembayaran: payMethod,
             _token: '{{ csrf_token() }}'
         };
 
@@ -387,22 +460,26 @@
         .then(response => response.json())
         .then(res => {
             if (res.success) {
-                clearCart();
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Transaksi Berhasil!',
-                    text: 'Pesanan telah diproses dan disimpan.',
-                    showCancelButton: true,
-                    confirmButtonText: '<i class="bi bi-printer me-2"></i> Cetak Struk',
-                    cancelButtonText: 'Transaksi Baru',
-                    confirmButtonColor: '#7e22ce',
-                    cancelButtonColor: '#94a3b8',
-                    borderRadius: '25px'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.open(`/admin/transaksi/${res.id_t}/cetak`, '_blank');
-                    }
-                });
+                if (payMethod === 'QRIS') {
+                    showQRIS(res.qr_url, res.order_id);
+                } else {
+                    clearCart();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Transaksi Berhasil!',
+                        text: 'Pesanan telah diproses dan disimpan.',
+                        showCancelButton: true,
+                        confirmButtonText: '<i class="bi bi-printer me-2"></i> Cetak Struk',
+                        cancelButtonText: 'Transaksi Baru',
+                        confirmButtonColor: '#7e22ce',
+                        cancelButtonColor: '#94a3b8',
+                        borderRadius: '25px'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.open(`/admin/transaksi/${res.id_t}/cetak`, '_blank');
+                        }
+                    });
+                }
             } else {
                 Swal.fire({
                     icon: 'error',
@@ -420,6 +497,57 @@
             btn.innerHTML = 'Selesaikan Transaksi';
             btn.disabled = cart.length === 0;
         });
+    }
+
+    function showQRIS(url, orderId) {
+        document.getElementById('qrisImage').src = url;
+        document.getElementById('qrisTotal').innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(totalValue);
+        currentOrderId = orderId;
+
+        const qrisModal = new bootstrap.Modal(document.getElementById('qrisModal'));
+        qrisModal.show();
+
+        // Start Polling
+        startPolling(orderId);
+    }
+
+    function startPolling(orderId) {
+        if (pollingInterval) clearInterval(pollingInterval);
+
+        pollingInterval = setInterval(() => {
+            fetch(`/admin/midtrans/status/${orderId}`)
+                .then(r => r.json())
+                .then(res => {
+                    if (res.success && (res.status === 'Settlement' || res.status === 'settlement' || res.status === 'capture')) {
+                        clearInterval(pollingInterval);
+                        bootstrap.Modal.getInstance(document.getElementById('qrisModal')).hide();
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Pembayaran Berhasil!',
+                            text: 'QRIS telah dibayar. Transaksi selesai.',
+                            showCancelButton: true,
+                            confirmButtonText: '<i class="bi bi-printer me-2"></i> Cetak Struk',
+                            cancelButtonText: 'Transaksi Baru',
+                            confirmButtonColor: '#7e22ce',
+                            cancelButtonColor: '#94a3b8',
+                            borderRadius: '25px'
+                        }).then((result) => {
+                            clearCart();
+                            if (result.isConfirmed) {
+                                window.open(`/admin/transaksi/${res.id_t}/cetak`, '_blank');
+                            }
+                        });
+                    }
+                })
+                .catch(e => console.error('Polling error:', e));
+        }, 3000); // Check every 3 seconds
+    }
+
+    function cancelQRIS() {
+        if (pollingInterval) clearInterval(pollingInterval);
+        bootstrap.Modal.getInstance(document.getElementById('qrisModal')).hide();
+        // Option: we could also call an API to cancel the transaction in DB if needed
     }
 </script>
 @endsection

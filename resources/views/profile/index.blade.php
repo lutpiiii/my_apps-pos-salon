@@ -1,4 +1,4 @@
-@extends(Auth::user()->role_p === 'admin' ? 'layouts.dashboard.admin' : 'layouts.dashboard.kasir')
+@extends(strtolower(Auth::user()->role_p) === 'admin' ? 'layouts.dashboard.admin' : 'layouts.dashboard.kasir')
 
 @section('content')
 <div class="container-fluid">
@@ -24,7 +24,7 @@
                 </div>
                 <h4 class="fw-bold mb-1 text-dark">{{ $user->nama_p }}</h4>
                 <div class="d-flex justify-content-center mb-4">
-                    @if($user->role_p === 'admin')
+                    @if(strtolower($user->role_p) === 'admin')
                         <span class="badge bg-danger bg-opacity-10 text-danger px-4 py-2 rounded-pill fw-bold small text-uppercase" style="letter-spacing: 1px;">
                             <i class="bi bi-shield-lock-fill me-1"></i> Administrator
                         </span>

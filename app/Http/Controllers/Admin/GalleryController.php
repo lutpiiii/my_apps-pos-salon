@@ -24,7 +24,7 @@ class GalleryController extends Controller
         ]);
 
         try {
-            $uploadPath = base_path('public/assets/uploads');
+            $uploadPath = public_path('assets/uploads');
             if (!file_exists($uploadPath)) {
                 mkdir($uploadPath, 0777, true);
             }
@@ -61,7 +61,7 @@ class GalleryController extends Controller
             ];
 
             if ($request->hasFile('foto_inf')) {
-                $uploadPath = base_path('public/assets/uploads');
+                $uploadPath = public_path('assets/uploads');
                 if (!file_exists($uploadPath)) {
                     mkdir($uploadPath, 0777, true);
                 }
@@ -70,7 +70,7 @@ class GalleryController extends Controller
                 if ($item->foto_inf) {
                     $oldPath = $uploadPath . DIRECTORY_SEPARATOR . $item->foto_inf;
                     if (file_exists($oldPath) && is_file($oldPath)) {
-                        unlink($oldPath);
+                        @unlink($oldPath);
                     }
                 }
 
@@ -93,7 +93,7 @@ class GalleryController extends Controller
 
         $filePath = public_path('assets/uploads/' . $item->foto_inf);
         if (file_exists($filePath)) {
-            unlink($filePath);
+            @unlink($filePath);
         }
 
         $item->delete();
